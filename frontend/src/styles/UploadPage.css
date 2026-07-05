@@ -1,0 +1,198 @@
+/**
+ * Стили страницы загрузки документов.
+ */
+
+.upload-page {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.upload-section,
+.documents-section {
+  background: var(--surface-color);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-md);
+}
+
+.upload-section h2,
+.documents-section h2 {
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+  color: var(--text-color);
+}
+
+.upload-hint,
+.search-hint {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+/* === Список загружаемых файлов === */
+.uploading-list {
+  margin-top: 1.5rem;
+}
+
+.uploading-list h3 {
+  font-size: 1rem;
+  margin-bottom: 0.75rem;
+  color: var(--text-color);
+}
+
+.upload-item {
+  background: var(--bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.upload-item.status-ready {
+  border-color: var(--success-color);
+  background: rgba(22, 163, 74, 0.05);
+}
+
+.upload-item.status-error {
+  border-color: var(--error-color);
+  background: rgba(220, 38, 38, 0.05);
+}
+
+.upload-item-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.file-name {
+  flex: 1;
+  font-weight: 500;
+  color: var(--text-color);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-size {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+.status-badge {
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.status-badge.status-pending {
+  background: #f1f5f9;
+  color: var(--text-secondary);
+}
+
+.status-badge.status-uploading {
+  background: rgba(37, 99, 235, 0.1);
+  color: var(--primary-color);
+}
+
+.status-badge.status-indexing {
+  background: rgba(217, 119, 6, 0.1);
+  color: var(--warning-color);
+}
+
+.status-badge.status-ready {
+  background: rgba(22, 163, 74, 0.1);
+  color: var(--success-color);
+}
+
+.status-badge.status-error {
+  background: rgba(220, 38, 38, 0.1);
+  color: var(--error-color);
+}
+
+.remove-btn {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1.25rem;
+  padding: 0 0.4rem;
+  line-height: 1;
+  border-radius: var(--radius-sm);
+  transition: all 0.2s ease;
+}
+
+.remove-btn:hover {
+  background: rgba(220, 38, 38, 0.1);
+  color: var(--error-color);
+}
+
+/* === Прогресс-бар === */
+.progress-bar {
+  width: 100%;
+  height: 4px;
+  background: var(--border-color);
+  border-radius: 2px;
+  margin-top: 0.5rem;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--primary-color);
+  border-radius: 2px;
+  transition: width 0.5s ease;
+}
+
+.upload-item.status-ready .progress-fill {
+  background: var(--success-color);
+}
+
+.upload-item.status-error .progress-fill {
+  background: var(--error-color);
+}
+
+.error-message {
+  color: var(--error-color);
+  font-size: 0.85rem;
+  margin-top: 0.4rem;
+}
+
+/* === Список документов === */
+.loading-text,
+.error-text {
+  color: var(--text-secondary);
+  padding: 1rem;
+  text-align: center;
+}
+
+.error-text {
+  color: var(--error-color);
+}
+
+/* === Адаптивность === */
+@media (max-width: 768px) {
+  .upload-section,
+  .documents-section {
+    padding: 1rem;
+  }
+
+  .upload-item-info {
+    gap: 0.5rem;
+  }
+
+  .file-name {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .upload-item-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.3rem;
+  }
+}

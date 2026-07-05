@@ -1,0 +1,143 @@
+/**
+ * Стили компонента списка загруженных документов.
+ */
+
+.document-list {
+  width: 100%;
+}
+
+.document-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.doc-count {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.refresh-btn {
+  padding: 0.4rem 0.8rem;
+  background: var(--surface-color);
+  color: var(--primary-color);
+  border: 1px solid var(--primary-color);
+  border-radius: var(--radius-md);
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.refresh-btn:hover {
+  background: var(--primary-color);
+  color: white;
+}
+
+/* === Таблица документов === */
+.documents-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--surface-color);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.documents-table thead {
+  background: var(--bg-color);
+  border-bottom: 2px solid var(--border-color);
+}
+
+.documents-table th {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.documents-table td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 0.9rem;
+}
+
+.documents-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.documents-table tbody tr:hover {
+  background: rgba(37, 99, 235, 0.02);
+}
+
+.doc-row.status-error {
+  background: rgba(220, 38, 38, 0.03);
+}
+
+.doc-name {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.doc-icon {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.doc-date {
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.doc-status {
+  white-space: nowrap;
+}
+
+/* === Пустой список === */
+.document-list-empty {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-secondary);
+  background: var(--bg-color);
+  border-radius: var(--radius-md);
+  border: 1px dashed var(--border-color);
+}
+
+.empty-hint {
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+  color: var(--text-secondary);
+}
+
+/* === Адаптивность === */
+@media (max-width: 768px) {
+  .documents-table th,
+  .documents-table td {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+  }
+
+  .doc-name {
+    max-width: 200px;
+  }
+}
+
+@media (max-width: 480px) {
+  .documents-table th:nth-child(2),
+  .documents-table td:nth-child(2) {
+    display: none;
+  }
+
+  .doc-name {
+    max-width: 150px;
+  }
+}

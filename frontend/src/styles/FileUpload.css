@@ -1,0 +1,80 @@
+/**
+ * Стили компонента Drag-and-Drop загрузки файлов.
+ */
+
+.file-upload {
+  border: 2px dashed var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: var(--bg-color);
+  margin-bottom: 1rem;
+}
+
+.file-upload:hover {
+  border-color: var(--primary-color);
+  background: rgba(37, 99, 235, 0.03);
+}
+
+.file-upload.dragging {
+  border-color: var(--primary-color);
+  background: rgba(37, 99, 235, 0.08);
+  transform: scale(1.01);
+  box-shadow: var(--shadow-md);
+}
+
+.upload-icon {
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+  transition: color 0.3s ease;
+}
+
+.file-upload:hover .upload-icon,
+.file-upload.dragging .upload-icon {
+  color: var(--primary-color);
+}
+
+.upload-text {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-color);
+  margin-bottom: 0.5rem;
+}
+
+.upload-subtext {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+/* === Адаптивность === */
+@media (max-width: 768px) {
+  .file-upload {
+    padding: 1.5rem 1rem;
+  }
+
+  .upload-icon svg {
+    width: 36px;
+    height: 36px;
+  }
+
+  .upload-text {
+    font-size: 0.9rem;
+  }
+
+  .upload-subtext {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .file-upload {
+    padding: 1.25rem 0.75rem;
+  }
+
+  .upload-icon svg {
+    width: 32px;
+    height: 32px;
+  }
+}

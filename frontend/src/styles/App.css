@@ -1,0 +1,111 @@
+/**
+ * Стили корневого компонента App.
+ * Шапка, навигация и подвал.
+ */
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* === Шапка === */
+.app-header {
+  background: var(--surface-color);
+  border-bottom: 1px solid var(--border-color);
+  padding: 1rem 2rem;
+  box-shadow: var(--shadow-sm);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.app-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-color);
+  margin-bottom: 0.75rem;
+  text-align: center;
+}
+
+.app-nav {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.nav-link {
+  padding: 0.5rem 1.25rem;
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-weight: 500;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.nav-link:hover {
+  color: var(--primary-color);
+  background: rgba(37, 99, 235, 0.05);
+  text-decoration: none;
+}
+
+.nav-link.active {
+  color: var(--primary-color);
+  background: rgba(37, 99, 235, 0.1);
+  border-color: var(--primary-color);
+}
+
+/* === Основной контент === */
+.app-main {
+  flex: 1;
+  padding: 2rem;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* === Подвал === */
+.app-footer {
+  background: var(--surface-color);
+  border-top: 1px solid var(--border-color);
+  padding: 1rem 2rem;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
+/* === Адаптивность === */
+@media (max-width: 768px) {
+  .app-header {
+    padding: 0.75rem 1rem;
+  }
+
+  .app-title {
+    font-size: 1.25rem;
+  }
+
+  .app-main {
+    padding: 1rem;
+  }
+
+  .nav-link {
+    padding: 0.4rem 1rem;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-title {
+    font-size: 1.1rem;
+  }
+
+  .app-nav {
+    gap: 0.5rem;
+  }
+
+  .nav-link {
+    padding: 0.35rem 0.75rem;
+    font-size: 0.85rem;
+  }
+}

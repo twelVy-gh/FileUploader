@@ -1,0 +1,128 @@
+/**
+ * Стили компонента результатов поиска.
+ */
+
+.search-results {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.result-card {
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.25rem;
+  transition: all 0.2s ease;
+}
+
+.result-card:hover {
+  border-color: var(--primary-color);
+  box-shadow: var(--shadow-sm);
+  transform: translateY(-1px);
+}
+
+/* === Шапка карточки === */
+.result-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.result-file-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.result-file-icon {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.result-file-name {
+  font-weight: 600;
+  color: var(--text-color);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.result-page {
+  padding: 0.2rem 0.6rem;
+  background: var(--bg-color);
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.result-score {
+  padding: 0.2rem 0.6rem;
+  background: rgba(37, 99, 235, 0.1);
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  color: var(--primary-color);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* === Текст результата === */
+.result-text {
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: var(--text-color);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Подсветка совпадений */
+.result-text mark {
+  background: var(--highlight-color);
+  color: var(--text-color);
+  padding: 0.1rem 0.2rem;
+  border-radius: 2px;
+  font-weight: 500;
+}
+
+/* === Адаптивность === */
+@media (max-width: 768px) {
+  .result-card {
+    padding: 0.75rem 1rem;
+  }
+
+  .result-header {
+    gap: 0.5rem;
+  }
+
+  .result-file-name {
+    font-size: 0.9rem;
+  }
+
+  .result-text {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .result-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.4rem;
+  }
+
+  .result-file-info {
+    width: 100%;
+  }
+
+  .result-page,
+  .result-score {
+    font-size: 0.75rem;
+  }
+}

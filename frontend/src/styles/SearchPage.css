@@ -1,0 +1,206 @@
+/**
+ * Стили страницы поиска.
+ */
+
+.search-page {
+  display: flex;
+  flex-direction: column;
+}
+
+.search-section {
+  background: var(--surface-color);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-md);
+}
+
+.search-section h2 {
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+  color: var(--text-color);
+}
+
+.search-hint {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+/* === Форма поиска === */
+.search-form {
+  margin-bottom: 1.5rem;
+}
+
+.search-input-wrapper {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.search-input {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-md);
+  font-size: 1rem;
+  color: var(--text-color);
+  background: var(--surface-color);
+  transition: border-color 0.2s ease;
+  outline: none;
+}
+
+.search-input:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.search-input:disabled {
+  background: var(--bg-color);
+  cursor: not-allowed;
+}
+
+.search-btn {
+  padding: 0.75rem 1.5rem;
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 1rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.search-btn:hover:not(:disabled) {
+  background: var(--primary-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.search-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* === Ошибки и загрузка === */
+.search-error,
+.search-loading,
+.no-results {
+  padding: 1.5rem;
+  text-align: center;
+  border-radius: var(--radius-md);
+  margin: 1rem 0;
+}
+
+.search-error {
+  background: rgba(220, 38, 38, 0.05);
+  border: 1px solid rgba(220, 38, 38, 0.2);
+  color: var(--error-color);
+}
+
+.search-loading {
+  background: rgba(37, 99, 235, 0.05);
+  border: 1px solid rgba(37, 99, 235, 0.2);
+  color: var(--primary-color);
+}
+
+.no-results {
+  background: var(--bg-color);
+  border: 1px dashed var(--border-color);
+  color: var(--text-secondary);
+}
+
+.no-results-hint {
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+  color: var(--text-secondary);
+}
+
+/* === Информация о результатах === */
+.results-info {
+  padding: 0.75rem 1rem;
+  background: var(--bg-color);
+  border-radius: var(--radius-md);
+  margin-bottom: 1rem;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.results-info strong {
+  color: var(--text-color);
+}
+
+/* === Пагинация === */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.pagination-btn {
+  padding: 0.5rem 1rem;
+  background: var(--surface-color);
+  color: var(--primary-color);
+  border: 1px solid var(--primary-color);
+  border-radius: var(--radius-md);
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background: var(--primary-color);
+  color: white;
+}
+
+.pagination-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  border-color: var(--border-color);
+  color: var(--text-secondary);
+}
+
+.pagination-info {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  min-width: 80px;
+  text-align: center;
+}
+
+/* === Адаптивность === */
+@media (max-width: 768px) {
+  .search-section {
+    padding: 1rem;
+  }
+
+  .search-input-wrapper {
+    flex-direction: column;
+  }
+
+  .search-btn {
+    width: 100%;
+  }
+
+  .pagination {
+    gap: 0.5rem;
+  }
+
+  .pagination-btn {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .search-section h2 {
+    font-size: 1.1rem;
+  }
+
+  .pagination-info {
+    font-size: 0.8rem;
+    min-width: 60px;
+  }
+}
