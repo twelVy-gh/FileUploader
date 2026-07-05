@@ -31,14 +31,14 @@ async def lifespan(app: FastAPI):
     """
     # === Startup ===
     logger.info("Starting application...")
-    
+
     # Инициализация базы данных (создание таблиц)
     try:
         init_db()
         logger.info("Database initialized successfully")
     except Exception as e:
         logger.error(f"Failed to initialize database: {e}")
-    
+
     # Создание индекса в Elasticsearch
     try:
         if es_service.ping():
@@ -48,11 +48,12 @@ async def lifespan(app: FastAPI):
             logger.warning("Elasticsearch is not available")
     except Exception as e:
         logger.error(f"Failed to initialize Elasticsearch: {e}")
-    
-    logger.info(f"Application started on {settings.APP_HOST}:{settings.APP_PORT}")
-    
+
+    logger.info(
+        f"Application started on {settings.APP_HOST}:{settings.APP_PORT}")
+
     yield  # Приложение работает
-    
+
     # === Shutdown ===
     logger.info("Shutting down application...")
 
@@ -95,7 +96,7 @@ app.include_router(search_router)
 async def root():
     """
     Корневой эндпоинт для проверки работоспособности API.
-    
+
     Returns:
         dict: Сообщение о статусе API
     """
@@ -115,7 +116,7 @@ async def root():
 async def health_check():
     """
     Проверка состояния API и зависимостей.
-    
+
     Returns:
         dict: Статус API, PostgreSQL и Elasticsearch
     """
@@ -124,7 +125,7 @@ async def health_check():
         "elasticsearch": "unknown",
         "database": "unknown"
     }
-    
+
     # Проверка Elasticsearch
     try:
         if es_service.ping():
@@ -133,7 +134,7 @@ async def health_check():
             health["elasticsearch"] = "unhealthy"
     except Exception:
         health["elasticsearch"] = "unhealthy"
-    
+
     # Проверка PostgreSQL
     try:
         from app.core.database import engine
@@ -142,7 +143,7 @@ async def health_check():
         health["database"] = "healthy"
     except Exception:
         health["database"] = "unhealthy"
-    
+
     return health
 
 

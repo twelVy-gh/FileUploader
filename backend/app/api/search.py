@@ -27,18 +27,18 @@ async def search_documents(
 ):
     """
     Полнотекстовый поиск по документам.
-    
+
     Выполняет поиск в Elasticsearch по полю text с использованием
     русскоязычного анализатора. Поддерживает пагинацию.
-    
+
     Args:
         q: Поисковый запрос (обязательный параметр)
         from_item: Начальный индекс для пагинации (по умолчанию 0)
         size: Количество результатов на странице (по умолчанию 10, макс 100)
-        
+
     Returns:
         SearchResponse: Результаты поиска с метаданными
-        
+
     Raises:
         HTTPException: Если поиск не удался или запрос пустой
     """
@@ -47,14 +47,14 @@ async def search_documents(
             status_code=400,
             detail="Поисковый запрос не может быть пустым"
         )
-    
+
     try:
         result = es_service.search(
             query=q.strip(),
             from_item=from_item,
             size=size
         )
-        
+
         return SearchResponse(
             results=[
                 SearchResultItem(
@@ -70,7 +70,7 @@ async def search_documents(
             from_item=result["from_item"],
             size=result["size"]
         )
-        
+
     except Exception as e:
         logger.error(f"Search failed for query '{q}': {e}")
         raise HTTPException(

@@ -4,7 +4,7 @@
 """
 
 import logging
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any
 
 from elasticsearch import Elasticsearch
 from elasticsearch.helpers import bulk
@@ -17,16 +17,16 @@ logger = logging.getLogger(__name__)
 class ElasticsearchService:
     """
     Сервис для взаимодействия с Elasticsearch.
-    
+
     Methods:
         create_index: Создание индекса с маппингом
         index_chunks: Индексация списка чанков
         search: Полнотекстовый поиск
         ping: Проверка соединения
     """
-    
+
     INDEX_NAME = "documents"
-    
+
     def __init__(self):
         """Инициализация клиента Elasticsearch."""
         self.client = Elasticsearch(
@@ -35,11 +35,11 @@ class ElasticsearchService:
             max_retries=3,
             retry_on_timeout=True
         )
-    
+
     def ping(self) -> bool:
         """
         Проверка соединения с Elasticsearch.
-        
+
         Returns:
             bool: True если соединение установлено
         """
@@ -48,18 +48,18 @@ class ElasticsearchService:
         except Exception as e:
             logger.error(f"Elasticsearch ping failed: {e}")
             return False
-    
+
     def create_index(self) -> bool:
         """
         Создание индекса documents с русскоязычным анализатором.
-        
+
         Returns:
             bool: True если индекс создан или уже существует
         """
         if self.client.indices.exists(index=self.INDEX_NAME):
             logger.info(f"Index '{self.INDEX_NAME}' already exists")
             return True
-        
+
         settings_body = {
             "settings": {
                 "analysis": {
@@ -110,28 +110,29 @@ class ElasticsearchService:
                 }
             }
         }
-        
+
         try:
-            self.client.indices.create(index=self.INDEX_NAME, body=settings_body)
+            self.client.indices.create(
+                index=self.INDEX_NAME, body=settings_body)
             logger.info(f"Index '{self.INDEX_NAME}' created successfully")
             return True
         except Exception as e:
             logger.error(f"Failed to create index: {e}")
             return False
-    
+
     def index_chunks(self, chunks: List[Dict[str, Any]]) -> int:
         """
         Индексация списка чанков в Elasticsearch.
-        
+
         Args:
             chunks: Список чанков с полями chunk_id, file_name, page_number, text
-            
+
         Returns:
             int: Количество успешно проиндексированных чанков
         """
         if not chunks:
             return 0
-        
+
         actions = []
         for chunk in chunks:
             action = {
@@ -145,7 +146,7 @@ class ElasticsearchService:
                 }
             }
             actions.append(action)
-        
+
         try:
             success, _ = bulk(self.client, actions, raise_on_error=True)
             logger.info(f"Indexed {success} chunks")
@@ -153,7 +154,7 @@ class ElasticsearchService:
         except Exception as e:
             logger.error(f"Bulk indexing failed: {e}")
             raise
-    
+
     def search(
         self,
         query: str,
@@ -162,12 +163,12 @@ class ElasticsearchService:
     ) -> Dict[str, Any]:
         """
         Полнотекстовый поиск по индексу documents.
-        
+
         Args:
             query: Поисковый запрос
             from_item: Начальный индекс для пагинации
             size: Количество результатов на странице
-            
+
         Returns:
             Dict[str, Any]: Результаты поиска с метаданными
         """
@@ -190,16 +191,19 @@ class ElasticsearchService:
             "from": from_item,
             "size": size
         }
-        
+
         try:
             response = self.client.search(index=self.INDEX_NAME, body=body)
             hits = response["hits"]
             total = hits["total"]["value"]
-            
+
             results = []
             for hit in hits["hits"]:
                 source = hit["_source"]
-                highlighted = hit.get("highlight", {}).get("text", [source["text"]])
+                highlighted = hit.get(
+                    "highlight", {}).get(
+                    "text", [
+                        source["text"]])
                 results.append({
                     "chunk_id": source["chunk_id"],
                     "file_name": source["file_name"],
@@ -207,7 +211,7 @@ class ElasticsearchService:
                     "text": highlighted[0] if highlighted else source["text"],
                     "score": hit["_score"]
                 })
-            
+
             return {
                 "results": results,
                 "total": total,
