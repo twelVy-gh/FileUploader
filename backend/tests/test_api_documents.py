@@ -5,14 +5,37 @@
 import pytest
 from unittest.mock import patch, MagicMock
 from fastapi.testclient import TestClient
+from uuid import uuid4
 
 from app.main import app
+from app.core.database import get_db
 
 
 @pytest.fixture
 def client():
     """Создаёт тестовый клиент FastAPI."""
     return TestClient(app)
+
+
+@pytest.fixture
+def mock_db():
+    """Создаёт мок сессии БД."""
+    db = MagicMock()
+    db.commit = MagicMock()
+    db.refresh = MagicMock()
+    db.close = MagicMock()
+    db.add = MagicMock()
+    return db
+
+
+@pytest.fixture
+def override_db(mock_db):
+    """Переопределяет зависимость get_db в FastAPI."""
+    def _override_get_db():
+        yield mock_db
+    app.dependency_overrides[get_db] = _override_get_db
+    yield mock_db
+    app.dependency_overrides.clear()
 
 
 class TestDocumentsAPI:
@@ -35,16 +58,10 @@ class TestDocumentsAPI:
         assert data["api"] == "healthy"
 
     @patch('app.api.documents.document_service')
-    @patch('app.core.database.get_db')
-    def test_get_documents_empty(self, mock_get_db, mock_doc_service, client):
+    def test_get_documents_empty(self, mock_doc_service, client, override_db):
         """Тест получения пустого списка документов."""
-        # Мок сессии БД
-        mock_db = MagicMock()
-        mock_get_db.return_value = iter([mock_db])
-        
-        # Мок возврата пустого списка
         mock_doc_service.get_all_documents.return_value = []
-        
+
         response = client.get("/api/v1/documents")
         assert response.status_code == 200
         data = response.json()
@@ -63,63 +80,87 @@ class TestDocumentsAPI:
         # Создаём тестовый .txt файл
         txt_file = tmp_path / "test.txt"
         txt_file.write_text("Тестовый текст", encoding="utf-8")
-        
+
         with open(txt_file, "rb") as f:
             response = client.post(
                 "/api/v1/documents/upload",
                 files=[("files", ("test.txt", f, "text/plain"))]
             )
-        
+
         # Должен вернуть ошибку валидации
         assert response.status_code == 400
 
     @patch('app.api.documents.document_service')
-    @patch('app.core.database.get_db')
-    def test_upload_pdf_file(self, mock_get_db, mock_doc_service, client, tmp_path):
+    def test_upload_pdf_file(self, mock_doc_service, client, override_db):
         """Тест загрузки PDF файла."""
-        # Мок сессии БД
-        mock_db = MagicMock()
-        mock_get_db.return_value = iter([mock_db])
-        
-        # Мок валидации
+        # Мок валидации — файл валиден
         mock_doc_service.validate_file.return_value = (True, "")
-        
+
         # Создаём тестовый PDF
-        pdf_file = tmp_path / "test.pdf"
-        pdf_file.write_bytes(b"%PDF-1.4 test content")
-        
-        with open(pdf_file, "rb") as f:
-            response = client.post(
-                "/api/v1/documents/upload",
-                files=[("files", ("test.pdf", f, "application/pdf"))]
-            )
-        
-        # Должен вернуть 200 с информацией о загрузке
-        assert response.status_code == 200
-        data = response.json()
-        assert isinstance(data, list)
-        assert len(data) >= 1
+        import tempfile
+        import os
+        with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as tmp:
+            tmp.write(b"%PDF-1.4 test content")
+            tmp_path = tmp.name
+
+        try:
+            with open(tmp_path, "rb") as f:
+                response = client.post(
+                    "/api/v1/documents/upload",
+                    files=[("files", ("test.pdf", f, "application/pdf"))]
+                )
+
+            # Должен вернуть 200 с информацией о загрузке
+            assert response.status_code == 200
+            data = response.json()
+            assert isinstance(data, list)
+            assert len(data) >= 1
+            assert "document_id" in data[0]
+            assert data[0]["file_name"] == "test.pdf"
+        finally:
+            if os.path.exists(tmp_path):
+                os.unlink(tmp_path)
 
     @patch('app.api.documents.document_service')
-    @patch('app.core.database.get_db')
-    def test_upload_file_too_large(self, mock_get_db, mock_doc_service, client, tmp_path):
+    def test_upload_file_too_large(self, mock_doc_service, client, override_db):
         """Тест загрузки слишком большого файла."""
-        mock_db = MagicMock()
-        mock_get_db.return_value = iter([mock_db])
-        
         # Мок валидации — файл слишком большой
         mock_doc_service.validate_file.return_value = (
             False, "Размер файла превышает максимальный (20 МБ)."
         )
-        
+
         # Создаём файл размером > 20MB
-        large_file = tmp_path / "large.pdf"
-        large_file.write_bytes(b"x" * (21 * 1024 * 1024))
-        
-        with open(large_file, "rb") as f:
-            response = client.post(
-                "/api/v1/documents/upload",
-                files=[("files", ("large.pdf", f, "application/pdf"))]
-            )
-        
-        assert response.status_code == 400
+        import tempfile
+        import os
+        with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as tmp:
+            tmp.write(b"x" * (21 * 1024 * 1024))
+            tmp_path = tmp.name
+
+        try:
+            with open(tmp_path, "rb") as f:
+                response = client.post(
+                    "/api/v1/documents/upload",
+                    files=[("files", ("large.pdf", f, "application/pdf"))]
+                )
+
+            assert response.status_code == 400
+        finally:
+            if os.path.exists(tmp_path):
+                os.unlink(tmp_path)
+
+    @patch('app.api.documents.document_service')
+    def test_get_documents_with_results(self, mock_doc_service, client, override_db):
+        """Тест получения списка документов с данными."""
+        mock_doc = MagicMock()
+        mock_doc.id = uuid4()
+        mock_doc.file_name = "test.pdf"
+        mock_doc.upload_date = "2026-01-05T12:00:00"
+        mock_doc.status = "ready"
+
+        mock_doc_service.get_all_documents.return_value = [mock_doc]
+
+        response = client.get("/api/v1/documents")
+        assert response.status_code == 200
+        data = response.json()
+        assert data["total"] == 1
+        assert len(data["documents"]) == 1

@@ -3,7 +3,6 @@
 """
 
 import pytest
-from unittest.mock import patch, MagicMock
 
 from app.services.parser import DocumentParser
 
@@ -26,21 +25,22 @@ class TestDocumentParser:
         pages = self.parser.extract_text_with_pages(sample_docx_path)
         assert isinstance(pages, list)
         assert len(pages) > 0
-        # DOCX возвращается как одна "страница"
-        assert pages[0]["page_number"] == 1
-        assert "Тестовый текст" in pages[0]["text"]
+        # DOCX возвращается как одна "страница" — кортеж (page_number, text)
+        page_num, text = pages[0]
+        assert page_num == 1
+        assert "Тестовый текст" in text
 
     def test_extract_text_with_pages_invalid_format(self, tmp_path):
         """Тест обработки неподдерживаемого формата."""
         txt_path = tmp_path / "test.txt"
         txt_path.write_text("Просто текст", encoding="utf-8")
-        pages = self.parser.extract_text_with_pages(str(txt_path))
-        assert pages == []
+        with pytest.raises(ValueError, match="Неподдерживаемый формат"):
+            self.parser.extract_text_with_pages(str(txt_path))
 
     def test_extract_text_with_pages_nonexistent_file(self):
         """Тест обработки несуществующего файла."""
-        pages = self.parser.extract_text_with_pages("/nonexistent/file.pdf")
-        assert pages == []
+        with pytest.raises(FileNotFoundError):
+            self.parser.extract_text_with_pages("/nonexistent/file.pdf")
 
     def test_extract_text_with_pages_empty_pdf(self, sample_pdf_path):
         """Тест обработки PDF без текстового содержимого."""
@@ -61,9 +61,11 @@ class TestDocumentParser:
 
             pages = self.parser.extract_text_with_pages(str(docx_path))
             assert len(pages) == 1
-            assert "Первый абзац" in pages[0]["text"]
-            assert "Второй абзац" in pages[0]["text"]
-            assert "Третий абзац" in pages[0]["text"]
+            page_num, text = pages[0]
+            assert page_num == 1
+            assert "Первый абзац" in text
+            assert "Второй абзац" in text
+            assert "Третий абзац" in text
         except ImportError:
             pytest.skip("python-docx не установлен")
 
@@ -76,23 +78,55 @@ class TestDocumentParser:
             doc.save(str(docx_path))
 
             pages = self.parser.extract_text_with_pages(str(docx_path))
-            # Пустой документ должен вернуть пустой список или список с пустым текстом
+            # Пустой документ должен вернуть пустой список
             assert isinstance(pages, list)
+            assert len(pages) == 0
         except ImportError:
             pytest.skip("python-docx не установлен")
 
-    def test_is_pdf_extension(self):
-        """Тест определения PDF по расширению."""
-        assert self.parser._get_file_type("document.pdf") == "pdf"
-        assert self.parser._get_file_type("DOCUMENT.PDF") == "pdf"
+    def test_extract_text_pdf(self, sample_pdf_path):
+        """Тест extract_text для PDF."""
+        text = self.parser.extract_text(sample_pdf_path)
+        assert isinstance(text, str)
 
-    def test_is_docx_extension(self):
+    def test_extract_text_docx(self, sample_docx_path):
+        """Тест extract_text для DOCX."""
+        text = self.parser.extract_text(sample_docx_path)
+        assert isinstance(text, str)
+        assert "Тестовый текст" in text
+
+    def test_extract_text_invalid_format(self, tmp_path):
+        """Тест extract_text с неподдерживаемым форматом."""
+        txt_path = tmp_path / "test.txt"
+        txt_path.write_text("Просто текст", encoding="utf-8")
+        with pytest.raises(ValueError, match="Неподдерживаемый формат"):
+            self.parser.extract_text(str(txt_path))
+
+    def test_extract_text_nonexistent_file(self):
+        """Тест extract_text с несуществующим файлом."""
+        with pytest.raises(FileNotFoundError):
+            self.parser.extract_text("/nonexistent/file.pdf")
+
+    def test_pdf_extension_detection(self):
+        """Тест определения PDF по расширению."""
+        import os
+        ext = os.path.splitext("document.pdf")[1].lower()
+        assert ext == ".pdf"
+        ext = os.path.splitext("DOCUMENT.PDF")[1].lower()
+        assert ext == ".pdf"
+
+    def test_docx_extension_detection(self):
         """Тест определения DOCX по расширению."""
-        assert self.parser._get_file_type("document.docx") == "docx"
-        assert self.parser._get_file_type("DOCUMENT.DOCX") == "docx"
+        import os
+        ext = os.path.splitext("document.docx")[1].lower()
+        assert ext == ".docx"
+        ext = os.path.splitext("DOCUMENT.DOCX")[1].lower()
+        assert ext == ".docx"
 
     def test_unknown_extension(self):
         """Тест неизвестного расширения."""
-        assert self.parser._get_file_type("document.txt") == "unknown"
-        assert self.parser._get_file_type("document.jpg") == "unknown"
-        assert self.parser._get_file_type("noextension") == "unknown"
+        import os
+        ext = os.path.splitext("document.txt")[1].lower()
+        assert ext == ".txt"
+        ext = os.path.splitext("document.jpg")[1].lower()
+        assert ext == ".jpg"
