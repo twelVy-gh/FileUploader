@@ -137,9 +137,10 @@ async def health_check():
 
     # Проверка PostgreSQL
     try:
+        from sqlalchemy import text
         from app.core.database import engine
         with engine.connect() as conn:
-            conn.execute("SELECT 1")
+            conn.execute(text("SELECT 1"))
         health["database"] = "healthy"
     except Exception:
         health["database"] = "unhealthy"
