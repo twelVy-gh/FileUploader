@@ -1,6 +1,8 @@
 node_modules
 npm-debug.log
+.gitignore
 dist
 .git
-.gitignore
 *.md
+.vscode
+.idea
