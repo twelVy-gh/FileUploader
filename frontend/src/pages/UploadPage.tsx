@@ -26,7 +26,21 @@ function UploadPage() {
     try {
       setLoading(true)
       const response = await getDocuments()
-      setDocuments(response.documents)
+      // Deduplicate documents by file_name, keeping the most recent one
+      const uniqueDocuments = response.documents.reduce((acc, doc) => {
+        const existingIndex = acc.findIndex(d => d.file_name === doc.file_name)
+        if (existingIndex === -1) {
+          acc.push(doc)
+        } else {
+          // Keep the one with the later upload_date
+          const existing = acc[existingIndex]
+          if (new Date(doc.upload_date) > new Date(existing.upload_date)) {
+            acc[existingIndex] = doc
+          }
+        }
+        return acc
+      }, [] as Document[])
+      setDocuments(uniqueDocuments)
     } catch (err) {
       setError('Не удалось загрузить список документов')
       console.error(err)
@@ -115,6 +129,10 @@ function UploadPage() {
         )
         // Обновляем список документов
         fetchDocuments()
+        // Удаляем завершенные загрузки из списка через 3 секунды
+        setTimeout(() => {
+          setUploadingFiles(prev => prev.filter(f => f.status !== 'ready'))
+        }, 3000)
       }, 2000)
 
     } catch (err) {
